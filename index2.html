@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Sound Demo</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+	var myAudio1, myAudio2, myAudio3, myAudio4;
+	$(function(){
+		$("#playSound1").click(function(){
+			if(myAudio1){
+				myAudio1.pause();
+			}
+
+			var soundId = $(this).data('sound-id');
+			var soundUrl = $(this).data('sound-url');
+			var speed = $("#soundSpeed" + soundId).val();
+			myAudio1 = new Audio(soundUrl + '_' + speed + '.wav');
+			myAudio1.loop = true;
+			myAudio1.play();
+		});
+		
+		$("#playSound2").click(function(){
+			if(myAudio2){
+				myAudio2.pause();
+			}
+
+			var soundId = $(this).data('sound-id');
+			var soundUrl = $(this).data('sound-url');
+			var speed = $("#soundSpeed" + soundId).val();
+			myAudio2 = new Audio(soundUrl + '_' + speed + '.wav');
+			myAudio2.loop = true;
+			myAudio2.play();
+		});
+		
+		$("#playSound3").click(function(){
+			if(myAudio3){
+				myAudio3.pause();
+			}
+
+			var soundId = $(this).data('sound-id');
+			var soundUrl = $(this).data('sound-url');
+			var speed = $("#soundSpeed" + soundId).val();
+			myAudio3 = new Audio(soundUrl + '_' + speed + '.wav');
+			myAudio3.loop = true;
+			myAudio3.play();
+		});
+		
+		$("#playSound4").click(function(){
+			if(myAudio4){
+				myAudio4.pause();
+			}
+
+			var soundId = $(this).data('sound-id');
+			var soundUrl = $(this).data('sound-url');
+			var speed = $("#soundSpeed" + soundId).val();
+			myAudio4 = new Audio(soundUrl + '_' + speed + '.wav');
+			myAudio4.loop = true;
+			myAudio4.play();
+		});
+	});
+</script>
+
+</head>
+<body>
+	<div class="sound">	
+		<button id="playSound1" data-sound-id="1"  data-sound-url="audio/drumsolo">Play Drums 1</button>
+		Speed:
+		<input type="range" id="soundSpeed1" min="1" max="3">
+	</div>
+
+	<div class="sound">	
+		<button id="playSound2" data-sound-id="2" data-sound-url="audio/handrums">Play Drums 2</button>
+		Speed:
+		<input type="range" id="soundSpeed2" min="1" max="3">
+	</div>
+	
+	<div class="sound">	
+		<button id="playSound3" data-sound-id="3" data-sound-url="audio/guitar">Play Guitar</button>
+		Speed:
+		<input type="range" id="soundSpeed3" min="1" max="3">
+	</div>
+	
+	<div class="sound">	
+		<button id="playSound4" data-sound-id="4" data-sound-url="audio/piano">Play Piano</button>
+		Speed:
+		<input type="range" id="soundSpeed4" min="1" max="3">
+	</div>
+</body>
+</html>

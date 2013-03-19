@@ -1,0 +1,55 @@
+window.onload=function() {
+
+	var speedOfGear = 1000;
+ 	var xlocation = 200;
+	var currentColor = 'red';
+	var count = 0;
+
+	var canvas = new Raphael(document.getElementById("canvas"));
+
+	var gearCircle = canvas.circle(xlocation, 200, 60).attr({fill: currentColor});
+	var gearText = canvas.text(xlocation, 200, "Gear 0").attr({'font-size':16});
+	var gear = canvas.set();
+	gear.push(gearCircle);
+	gear.push(gearText);
+
+	function createNewGear() {
+		speedOfGear = 1000;
+		xlocation = xlocation + 200;
+		count++;
+		var currentGearCircle = canvas.circle(xlocation, 200, 60).attr({fill: currentColor});
+		var currentGearText = canvas.text(xlocation, 200, "Gear "+count).attr({'font-size':16});
+		var currentGear = canvas.set();
+		currentGear.push(currentGearCircle);
+		currentGear.push(currentGearText);
+		function incSize() {
+			currentGear.animate({r:80}, speedOfGear, decSize);
+		}
+		function decSize() {
+			currentGear.animate({r:60}, speedOfGear, incSize);
+		}
+		incSize();
+		
+	}
+
+	function increaseSize() {
+		gear.animate({r:80}, speedOfGear, decreaseSize);
+	}
+
+	function decreaseSize() {
+		gear.animate({r:60}, speedOfGear, increaseSize);
+	}
+	
+	increaseSize();
+
+	setInterval(function() {
+		speedOfGear = speedOfGear - 100;
+		console.log(speedOfGear);		
+		if(speedOfGear < 200) {
+			createNewGear();
+		}
+	}, 1000);
+
+
+
+}
