@@ -7,13 +7,13 @@ $(function(){
         {
             $("#gearInfo, #gearTab").animate({
                 left:'+=' + width + 'px'
-            }, 'slow');
+            });
             $(this).data('state', 'out');
         }
         else{
             $("#gearInfo, #gearTab").animate({
                  left:'-=' + width + 'px'
-            }, 'slow');
+            });
             $(this).data('state', 'in');
         }
     });
@@ -24,15 +24,18 @@ $(function(){
         var width = $("#twitterInfo").width();
         if(state == 'in')
         {
+            $("#twitterInfo").show();
             $("#twitterInfo, #twitterTab").animate({
                 right:'+=' + width + 'px'
-            }, 'slow');
+            });
             $(this).data('state', 'out');
         }
         else{
             $("#twitterInfo, #twitterTab").animate({
                  right:'-=' + width + 'px'
-            }, 'slow');
+            }, function(){
+                $("#twitterInfo").hide();
+            });
             $(this).data('state', 'in');
         }
     });
