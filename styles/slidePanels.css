@@ -47,13 +47,14 @@ body{
     position: absolute;
     top:0px;
     left:-305px;
-    border-right:1px solid #88000a;
+    border-right:1px solid #161515;
+    z-index:100;
 }
 
 #twitterTab{
     position: absolute;
     top:200px;
-    right:0px;
+    right:1px;
     cursor: pointer;
 }
 
@@ -61,19 +62,31 @@ body{
     position: absolute;
     top:0px;
     right:-300px;
-    border-left:1px solid #029ad2;
+    border-left:1px solid #161515;
     display: none;
-    z-index:10;
+    z-index:100;
 }
 
 #diagonalsBgRight{
     position: absolute;
     bottom:0px;
-    left:0px;
-    width:100%;
+    right:0px;
+    width:99%;
     height:150px;
     background-image: url('../images/diagonals-right.png');
     background-repeat: no-repeat;
-    background-position: center bottom;
-    z-index: 100;
+    background-position: right bottom;
+    z-index:-1;
+}
+
+#diagonalsBgLeft{
+    position: absolute;
+    bottom:0px;
+    left:0px;
+    width:99%;
+    height:150px;
+    background-image: url('../images/diagonals-left.png');
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    z-index:-1;
 }
