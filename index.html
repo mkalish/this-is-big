@@ -1,17 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
 <html>
-	<head>
-		<script type="text/javascript" src="scripts/raphael-2.1.js"></script>
-		<script type="text/javascript" src="script.js"></script>
+<head>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="scripts/raphael-2.1.js"></script>
+	<script type="text/javascript" src="scripts/script.js"></script>
+	<script type="text/javascript" src="scripts/slidePanels.js"></script>
+	<link rel="stylesheet" href="styles/slidePanels.css"/>
 
-	</head>
-	<body style="background:black">
-	
-		<div id="canvas"></div>
-	</body>
+	<title></title>
+</head>
 
+<body style="background:black">
+	<div id="canvas"></div>
 
+	<div id="contents">
+		<div id="container">
+			<div id="gearSlideOut">
+				<span id="gearTab" class="tab" data-state="in" data-orientation="left-right"><img src="images/gearInfoTab.png"></span>
 
+				<div id="gearInfo" class="content">
+					<div id="diagonalsBgLeft"></div>
+				</div>
 
+				<div id="twitterSlideOut">
+					<span id="twitterTab" class="tab" data-state="in" data-orientation="right-left"><img src="images/twitterSteamTab.png"></span>
 
-
+					<div id="twitterInfo" class="content">
+						<div id="diagonalsBgRight"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
 </html>
