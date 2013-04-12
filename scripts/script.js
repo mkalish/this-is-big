@@ -1,10 +1,10 @@
 var speedToStart = 1000;
 var xLocation = 800;
 var yLocation = 500;
-var currentColor = 'red';
+var currentColor = 'green';
 var gearId = 0;
 var nodeId = 0;
-var nodeLocations = [{x:900,y:500},{x:500,y:500},{x:1200, y:600}];
+var nodeLocations = [{x:900, y:600},{x:600,y:300},{x:1300, y:500}];
 var canvas;
 var circleRadius = 200;
 var all_gears= [];
@@ -45,7 +45,6 @@ function createNewGear(UISet) {
 	self.decreaseSize = decreaseSize;
 	function decreaseSize() {
 		self.ui.animate({r:5}, self.speed, self.increaseSize);
-		//makeMove();
 	}
 	
 	
@@ -59,6 +58,57 @@ function createNewGear(UISet) {
 		self.speed = this.speed - 100;
 		self.ui.stop();
 		self.startPulse();
+		if (self.speed < 400) {
+			self.ui.animate({fill:'red'}, 100);
+		} else if (self.speed < 800) {
+			self.ui.animate({fill:'yellow'}, 100);
+		}
+	}
+	
+	self.estimateMove = estimateMove;
+	function estimateMove() {
+		var currentX = self.xPos;
+		var currentY = self.yPos;
+		switch (self.currentDirection) {
+			case 0:
+				currentY += .5;
+				break;
+			case 1:
+				currentY += -.5;
+				break;
+			case 2:
+				currentX += -.5;
+				break;
+			case 3:
+				currentX += .5;
+				break;
+			case 4:
+				currentX += -.5;
+				currentY += .5;
+				break;
+			case 5:
+				currentX += .5;
+				currentY += .5;
+				break;
+			case 6:
+				currentX += -.5;
+				currentY += -.5;
+				break;
+			case 7:
+				currentX += .5;
+				currentY += -.5;
+				break;
+		}
+		var estimateSquared = (currentX * currentX) + (currentY * currentY);
+		var radiusSquared = circleRadius * circleRadius;
+		var valid = estimateSquared >= radiusSquared;
+		if (valid) {
+			return false;
+		} else {
+			self.xPos = currentX;
+			self.yPos = currentY;
+			return true;
+		}
 	}
 	
 	self.makeMove = makeMove;
@@ -66,77 +116,50 @@ function createNewGear(UISet) {
 		if (self.currentDirection == 'No direction') {
 			self.currentDirection = Math.floor(Math.random() * directions.length);
 		}
-		switch (self.currentDirection) {
-			case 0:
-				self.yPos += .5;
-				break;
-			case 1:
-				self.yPos += -.5;
-				break;
-			case 2:
-				self.xPos += -.5;
-				break;
-			case 3:
-				self.xPos += .5;
-				break;
-			case 4:
-				self.xPos += -.5;
-				self.yPos += .5;
-				break;
-			case 5:
-				self.xPos += .5;
-				self.yPos += .5;
-				break;
-			case 6:
-				self.xPos += -.5;
-				self.yPos += -.5;
-				break;
-			case 7:
-				self.xPos += .5;
-				self.yPos += -.5;
-				break;
-		}
-		var x2 = self.xPos*self.xPos;
-		var y2 = self.yPos*self.yPos;
-		var radius2 = (circleRadius*circleRadius);
-		if ((x2+y2+100) > radius2) {
-			console.log('switching direction'+ (x2+y2) + ',' + radius2);
-			switch (self.currentDirection) {
-			case 0:
-				var possible = [1,6,7];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 1:
-				var possible = [0,4,5];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 2:
-				var possible = [3,5,7];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 3:
-				var possible = [2,4,6];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 4:
-				var possible = [1,3,7];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 5:
-				var possible = [1,2,6];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 6:
-				var possible = [1,3,4];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			case 7:
-				var possible = [0,1,4];
-				self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-				break;
-			}
+		if(self.estimateMove()) {
+			self.ui.animate({transform: 'T'+self.xPos+','+self.yPos},10);
+			
 		} else {
-			self.ui.animate({transform: 'T'+self.xPos+','+self.yPos},10);	
+			console.log('changing direction');
+			switch (self.currentDirection) {
+				case 0:
+					var possible = [1,6,7];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 1:
+					var possible = [0,4,5];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 2:
+					var possible = [3,5,7];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 3:
+					var possible = [2,4,6];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 4:
+					var possible = [1,3,7];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 5:
+					var possible = [1,3,6];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 6:
+					var possible = [0,3,5];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+					break;
+				case 7:
+					var possible = [0,2,4];
+					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
+				break;	
+			}
+			if (self.estimateMove) {
+				self.ui.animate({transform: 'T'+self.xPos+','+self.yPos},10);
+			} else {
+				console.log('Mistake made in moving');
+			}			
 		}		
 	}
 	
@@ -147,13 +170,15 @@ function createNewGear(UISet) {
 	
 	this.reset = reset;
 	function reset() {
-		self.speed = speedToStart;		
+		self.speed = speedToStart;
+		self.ui.animate({fill:'green'}, 100);
 	}
 }
 
 function createGearUI(xCenter, yCenter) {
 	var gearCircle = canvas.circle(xCenter, yCenter, 5);
 	gearCircle.attr({fill: currentColor});
+	
 
 	return gearCircle;
 }
@@ -206,7 +231,9 @@ function createNode(UI,x ,y) {
 }
 
 function addNode() {
-	var newNode = new createNode(canvas.circle(nodeLocations[nodeId].x, nodeLocations[nodeId].y, 200).attr({fill:'black',stroke:'white'}),nodeLocations[nodeId].x, nodeLocations[nodeId].y);
+	var newNode = new createNode(canvas.circle(nodeLocations[nodeId].x, nodeLocations[nodeId].y, 200).attr({fill:'url(../images/tab-content-bg.png)', stroke:'white'}),nodeLocations[nodeId].x, nodeLocations[nodeId].y);
+	var rotateImage = Raphael.animation({transform:'r360'}, 10000).repeat(Infinity);
+	var gearImage = canvas.image('images/openshift.png', nodeLocations[nodeId].x- 150, nodeLocations[nodeId].y -150, 300, 300).animate(rotateImage);
 	all_nodes.push(newNode);
 }
 
@@ -228,7 +255,6 @@ window.onload=function() {
 	setInterval(function() {
 		for (i = 0; i <= all_gears.length-1; i++) {
 			all_gears[i].increaseSpeed();
-			//setInterval(all_gears[i].makeMove(), 100);
 		}
 		if (all_gears[0].speed <= 200) {
 			if (all_nodes[nodeId].nodes.length > 3) {
