@@ -1,6 +1,8 @@
-var speedToStart = 1000;
 var xLocation = 800;
 var yLocation = 500;
+var redThreshold = 200;
+var yellowThreshold = 400;
+var minSpeed = 1000;
 var currentColor = 'green';
 var gearId = 0;
 var nodeId = 0;
@@ -30,7 +32,7 @@ function createNewGear(UISet) {
 	var self = this;
 	self.ui = UISet;
 	self.id = gearId;
-	self.speed = speedToStart;
+	self.speed = minSpeed;
 	self.xPos = 0;
 	self.yPos = 0;
 	self.currentDirection = 'No direction';
@@ -56,14 +58,26 @@ function createNewGear(UISet) {
 	self.increaseSpeed = increaseSpeed;
 	function increaseSpeed() {
 		self.speed = this.speed - 100;
-		self.ui.stop();
-		self.startPulse();
-		if (self.speed < 400) {
-			self.ui.animate({fill:'red'}, 100);
-		} else if (self.speed < 800) {
-			self.ui.animate({fill:'yellow'}, 100);
-		}
+		self.handleSpeedAnim();
 	}
+        
+        self.setSpeed = setSpeed;
+	function setSpeed(percentage) {
+		self.speed = minSpeed * percentage;
+		self.handleSpeedAnim();
+	}
+        
+        
+	self.handleSpeedAnim = handleSpeedAnim;
+        function handleSpeedAnim(){
+            self.ui.stop();
+            self.startPulse();
+            if (self.speed < redThreshold) {
+                    self.ui.animate({fill:'red'}, 100);
+            } else if (self.speed < yellowThreshold) {
+                    self.ui.animate({fill:'yellow'}, 100);
+            }
+        }
 	
 	self.estimateMove = estimateMove;
 	function estimateMove() {
@@ -120,7 +134,7 @@ function createNewGear(UISet) {
 			self.ui.animate({transform: 'T'+self.xPos+','+self.yPos},10);
 			
 		} else {
-			console.log('changing direction');
+			//console.log('changing direction');
 			switch (self.currentDirection) {
 				case 0:
 					var possible = [1,6,7];
@@ -149,7 +163,8 @@ function createNewGear(UISet) {
 				case 6:
 					var possible = [0,3,5];
 					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
-					break;
+					//speedToStart
+                                        break;
 				case 7:
 					var possible = [0,2,4];
 					self.currentDirection = possible[Math.floor(Math.random()*possible.length)];
@@ -158,7 +173,7 @@ function createNewGear(UISet) {
 			if (self.estimateMove) {
 				self.ui.animate({transform: 'T'+self.xPos+','+self.yPos},10);
 			} else {
-				console.log('Mistake made in moving');
+				//console.log('Mistake made in moving');
 			}			
 		}		
 	}
@@ -239,8 +254,8 @@ function addNode() {
 
 
 window.onload=function() {
-
-
+        
+        
 	console.log("Canvas created");
 	canvas = new Raphael(document.getElementById("canvas"), 2000, 2000);
 	//canvas.circle(900, 500, 400).attr({fill:'black', stroke:'white'});
@@ -248,23 +263,82 @@ window.onload=function() {
 	//console.log("Gear created");
 	//addGear();
 	
-	addNode();
-	all_nodes[0].addGear();
-	
-	
-	setInterval(function() {
-		for (i = 0; i <= all_gears.length-1; i++) {
-			all_gears[i].increaseSpeed();
-		}
-		if (all_gears[0].speed <= 200) {
-			if (all_nodes[nodeId].nodes.length > 3) {
-				nodeId++;
-				addNode();
-			}
-			all_nodes[nodeId].addGear();
-			for (j=0; j <= all_gears.length -1; j++) {
-				all_gears[j].reset();
-			}
-		}
-	}, 8000);
+        //Initial Load
+        $.ajax({
+            url: 'http://summit-patburke234.rhcloud.com/summit',
+            type: 'GET',
+            dataType: 'jsonp',
+            jsonp: 'false',
+            jsonpCallback: 'jsonp12345',
+            error: function(xhr, status, error) {
+                alert(status);
+            },
+            success: function(jsonp) { 
+                    var gears = [];
+                    $.each(jsonp, function(gearName, gearData){
+                        gears.push(new gearInfo(gearName, gearData.load_pct));
+                    });
+                    
+                    for(var i = 0; i < gears.length; i++)
+                    {
+                        addNode();
+                        all_nodes[i].addGear();
+                        all_gears[i].setSpeed(gears[i].loadPercentage);
+                    }
+
+
+                    setInterval(function() {
+                          updateCanvas(); 
+                    }, 5000);
+            }
+        });
+        
+        
+}
+
+function updateCanvas(){
+    $.ajax({
+            url: 'http://summit-patburke234.rhcloud.com/summit',
+            type: 'GET',
+            dataType: 'jsonp',
+            jsonp: 'false',
+            jsonpCallback: 'jsonp12345',
+            error: function(xhr, status, error) {
+                console.log(status + ": " + xhr.responseText)
+            },
+            success: function(jsonp) { 
+                    var gears = [];
+                    $.each(jsonp, function(gearName, gearData){
+                        gears.push(new gearInfo(gearName, gearData.load_pct));
+                    });
+                    
+                    for(var i = 0; i < gears.length; i++)
+                    {
+                        try{
+                            if(all_gears.length <= i)
+                            {
+                                addNode();
+                                all_nodes[all_nodes.length - 1].addGear();
+                                all_gears[all_gears.length - 1].setSpeed(gears[i].loadPercentage);
+                            }
+                            else{
+                                all_gears[i].setSpeed(gears[i].loadPercentage);
+                            }
+                        }
+                            catch(e){
+                                console.log("Invalid index: " + i + " with length: " + all_gears.length);
+                            }
+                    }
+
+            }
+        });
+}
+
+
+
+function gearInfo(name, loadPct)
+{
+    var self = this;
+    self.loadPercentage = loadPct;
+    self.name = name;
 }
