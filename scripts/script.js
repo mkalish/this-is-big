@@ -3,6 +3,7 @@ var yLocation = 500;
 var redThreshold = 200;
 var yellowThreshold = 400;
 var minSpeed = 1000;
+var maxNumSessions = 20.0;
 var currentColor = 'green';
 var gearId = 0;
 var nodeId = 0;
@@ -11,6 +12,7 @@ var canvas;
 var circleRadius = 200;
 var all_gears= [];
 var all_nodes = [];
+var numAudioFiles = 6;
 var currentAudioId=1;
 var currentAudio;
 var animations = [Raphael.animation({transform: 't0,100'}, 1000),
@@ -62,8 +64,8 @@ function createNewGear(UISet) {
 	}
         
         self.setSpeed = setSpeed;
-	function setSpeed(percentage) {
-		self.speed = minSpeed * percentage;
+	function setSpeed(numSessions) {
+		self.speed = minSpeed * ( 1- (numSessions/maxNumSessions));
 		self.handleSpeedAnim();
 	}
         
@@ -73,9 +75,15 @@ function createNewGear(UISet) {
             self.ui.stop();
             self.startPulse();
             if (self.speed < redThreshold) {
-                    self.ui.animate({fill:'red'}, 100);
+                self.ui.animate({fill:'red'}, 100);
+                console.log("colored red: " + self.speed);
             } else if (self.speed < yellowThreshold) {
-                    self.ui.animate({fill:'yellow'}, 100);
+                self.ui.animate({fill:'yellow'}, 100);
+                console.log("colored yellow: " + self.speed);
+            }
+            else{
+                self.ui.animate({fill:'green'}, 100);
+                console.log("colored green: " + self.speed);
             }
         }
 	
@@ -204,15 +212,19 @@ function addGear() {
 	var newGear = new createNewGear(createGearUI());
 	newGear.startPulse();
 	newGear.startMoving();
-	var oldAudio = currentAudio;
-	currentAudio = new Audio("audio/RHSummit_"+currentAudioId+".wav");
-	if (oldAudio != null) {
-		oldAudio.mute = true;
-	}
-	currentAudio.loop=true;
-	currentAudio.play();
-	currentAudioId += 1;
-	all_gears.push(newGear);
+        if(currentAudioId <= numAudioFiles)
+        {
+            var oldAudio = currentAudio;
+            currentAudio = new Audio("audio/RHSummit_"+currentAudioId+".wav");
+            if (oldAudio != null) {
+                    oldAudio.mute = true;
+            }
+            currentAudio.loop=true;
+            currentAudio.play();
+
+            currentAudioId += 1;
+        }
+        all_gears.push(newGear);
 }
 
 function createNode(UI,x ,y) {
@@ -233,15 +245,18 @@ function createNode(UI,x ,y) {
 		addNode(newGear);
 		newGear.startPulse();
 		newGear.startMoving();
-		var oldAudio = currentAudio;
-		currentAudio = new Audio("audio/RHSummit_"+currentAudioId+".wav");
-		if (oldAudio != null) {
-			oldAudio.mute = true;
-		}
-		currentAudio.loop=true;
-		currentAudio.play();
-		currentAudioId += 1;
-		all_gears.push(newGear);
+                if(currentAudioId <= numAudioFiles)
+                {
+                    var oldAudio = currentAudio;
+                    currentAudio = new Audio("audio/RHSummit_"+currentAudioId+".wav");
+                    if (oldAudio != null) {
+                            oldAudio.mute = true;
+                    }
+                    currentAudio.loop=true;
+                    currentAudio.play();
+                    currentAudioId += 1;
+                }
+                all_gears.push(newGear);
 	}
 }
 
@@ -276,14 +291,14 @@ window.onload=function() {
             success: function(jsonp) { 
                     var gears = [];
                     $.each(jsonp, function(gearName, gearData){
-                        gears.push(new gearInfo(gearName, gearData.load_pct));
+                        gears.push(new gearInfo(gearName, gearData.sessions));
                     });
                     
                     for(var i = 0; i < gears.length; i++)
                     {
                         addNode();
                         all_nodes[i].addGear();
-                        all_gears[i].setSpeed(gears[i].loadPercentage);
+                        all_gears[i].setSpeed(gears[i].sessions);
                     }
 
 
@@ -309,7 +324,7 @@ function updateCanvas(){
             success: function(jsonp) { 
                     var gears = [];
                     $.each(jsonp, function(gearName, gearData){
-                        gears.push(new gearInfo(gearName, gearData.load_pct));
+                        gears.push(new gearInfo(gearName, gearData.sessions));
                     });
                     
                     for(var i = 0; i < gears.length; i++)
@@ -319,10 +334,10 @@ function updateCanvas(){
                             {
                                 addNode();
                                 all_nodes[all_nodes.length - 1].addGear();
-                                all_gears[all_gears.length - 1].setSpeed(gears[i].loadPercentage);
+                                all_gears[all_gears.length - 1].setSpeed(gears[i].sessions);
                             }
                             else{
-                                all_gears[i].setSpeed(gears[i].loadPercentage);
+                                all_gears[i].setSpeed(gears[i].sessions);
                             }
                         }
                             catch(e){
@@ -336,9 +351,9 @@ function updateCanvas(){
 
 
 
-function gearInfo(name, loadPct)
+function gearInfo(name, sessions)
 {
     var self = this;
-    self.loadPercentage = loadPct;
+    self.sessions = sessions;
     self.name = name;
 }
